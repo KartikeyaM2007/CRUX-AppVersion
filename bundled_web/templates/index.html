@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crux</title>
+    <meta name="description" content="Local synthetic data generation, repair, and cleaning powered by Ollama and CTGAN.">
+    <link rel="icon" type="image/png" href="/static/assets/crux-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,500;1,9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="page-rails" aria-hidden="true"></div>
+
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a class="brand" href="#home" data-route="home">
+                <img src="/static/assets/crux-logo.png" alt="Crux logo">
+                <span>Crux</span>
+            </a>
+            <div class="nav-center">
+                <a href="#generation" data-route="generation">Data Generation</a>
+                <a href="#repair" data-route="repair">Data Repair</a>
+                <a href="#cleaning" data-route="cleaning">Data Cleaning</a>
+                <a href="#home" data-route="home" data-scroll-target="agent-chat">Chatbot</a>
+            </div>
+            <div class="nav-actions">
+                <button class="info-button" id="info-button" type="button" aria-label="Open Crux info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Info</span>
+                </button>
+                <button class="btn btn-green" data-route="generation">Get Started</button>
+                <button class="btn btn-ghost" data-route="home" data-scroll-target="agent-chat">Ask Agent</button>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Open menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#generation" data-route="generation">Data Generation</a>
+            <a href="#repair" data-route="repair">Data Repair</a>
+            <a href="#cleaning" data-route="cleaning">Data Cleaning</a>
+            <a href="#home" data-route="home" data-scroll-target="agent-chat">Chatbot</a>
+            <button class="info-button mobile-info" id="mobile-info-button" type="button"><i class="fa-solid fa-circle-info"></i>Info</button>
+        </div>
+    </nav>
+
+    <div class="info-modal" id="info-modal" aria-hidden="true">
+        <div class="info-modal-backdrop" data-info-close></div>
+        <section class="info-dialog" role="dialog" aria-modal="true" aria-labelledby="info-title">
+            <button class="info-close" type="button" data-info-close aria-label="Close info"><i class="fa-solid fa-xmark"></i></button>
+            <p class="eyebrow">Crux Local Engine</p>
+            <h2 id="info-title">No API used. Your CSV stays local.</h2>
+            <p>Crux cleans, repairs, and generates synthetic financial data on this machine. The workflow uses local pandas rules, local Ollama/Llama 3 repair, CTGAN generation, and fidelity checks without uploading rows to an external data service.</p>
+            <p class="author-line">Author: Kartikeya Krishna Mishra</p>
+            <div class="info-points">
+                <span><i class="fa-solid fa-lock"></i>Local CSV processing</span>
+                <span><i class="fa-solid fa-terminal"></i>PowerShell-style logs</span>
+                <span><i class="fa-solid fa-diagram-project"></i>Visible workflows</span>
+                <span><i class="fa-solid fa-file-csv"></i>Downloadable outputs</span>
+            </div>
+        </section>
+    </div>
+
+    <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+    <main>
+        <section id="home" class="page active">
+            <div class="hero">
+                <div class="pill">
+                    <span>New</span>
+                    Local tabular dataset cleaning and generation
+                </div>
+                <div class="trust-quote">"No API used. Your CSV stays local."</div>
+                <h1>Generate Clean Data<br><em>from a Single CSV.</em></h1>
+                <p>Upload a messy financial dataset. This local engine repairs it with Llama 3 through Ollama, trains a CTGAN generator, and ships a synthetic CSV from your machine without sending rows to an external service.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-black" data-route="generation">Generate Data</button>
+                    <button class="btn btn-outline" data-route="cleaning">Clean a Dataset</button>
+                </div>
+                <div class="waitlist">
+                    <span class="avatar-stack"><i></i><i></i><i></i></span>
+                    <span><strong>0</strong> rows dropped by default</span>
+                </div>
+            </div>
+
+            <div class="dashboard-frame">
+                <div class="dashboard-shell">
+                    <div class="dash-top">
+                        <div class="dash-brand"><i></i><span>Crux</span></div>
+                        <label class="dash-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" value="Search for any pipeline job" aria-label="Search jobs">
+                        </label>
+                        <button class="active-jobs">Active Jobs</button>
+                    </div>
+                    <div class="dash-body">
+                        <aside>
+                            <p>Menu</p>
+                            <button class="selected"><i class="fa-solid fa-table-columns"></i>Overview</button>
+                            <button><i class="fa-solid fa-database"></i>Datasets</button>
+                            <button><i class="fa-solid fa-screwdriver-wrench"></i>Repairs</button>
+                            <button><i class="fa-solid fa-chart-simple"></i>Statistics</button>
+                            <button><i class="fa-solid fa-gear"></i>Settings</button>
+                        </aside>
+                        <div class="dash-main">
+                            <h2>Hello, Builder</h2>
+                            <div class="dash-content-grid">
+                                <div>
+                                    <div class="job-card">
+                                        <div class="job-title">
+                                            <span class="spinner-dot"></span>
+                                            <strong>Active Generation Job</strong>
+                                        </div>
+                                        <div class="progress-row">
+                                            <div>
+                                                <p>transaction-synth-v2</p>
+                                                <small>CTGAN - llama3 repair</small>
+                                            </div>
+                                            <div class="progress-area">
+                                                <span>Progress</span>
+                                                <div class="progress-track"><i></i></div>
+                                                <small>ETA local runtime</small>
+                                            </div>
+                                            <strong>78%</strong>
+                                        </div>
+                                    </div>
+                                    <div class="job-card queued">
+                                        <div class="queue-title">
+                                            <span><i class="fa-regular fa-clock"></i>Queued Jobs</span>
+                                            <b>2 waiting</b>
+                                        </div>
+                                        <div class="queue-row"><span>missing-category-repair</span><small>llama3 - 1K rows</small><em>Queued</em></div>
+                                        <div class="queue-row"><span>duplicate-cleaning-pass</span><small>pandas - CSV</small><em>Queued</em></div>
+                                    </div>
+                                </div>
+                                <div class="dash-side-tools">
+                                    <div class="dash-agent-card">
+                                        <div class="dash-agent-head"><i class="fa-solid fa-comments"></i><strong>Agent Chat</strong></div>
+                                        <p>Need financial fraud data?</p>
+                                        <span>Routes to generation</span>
+                                        <button data-route="home" data-scroll-target="agent-chat">Open Chatbot</button>
+                                    </div>
+                                    <div class="dash-mini-terminal">
+                                        <div><span>PS</span> repair started</div>
+                                        <div><span>OK</span> llama3 connected</div>
+                                        <div><span>LOG</span> row 1 analyzed</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="feature-grid">
+                <article class="feature-card" data-route="cleaning">
+                    <div>
+                        <h3>Data Cleaning</h3>
+                        <p>Normalize messy values, remove duplicates, trim strings, parse dates, and prepare rows before repair.</p>
+                    </div>
+                    <img src="/static/assets/crux-cleaning.png" alt="Crux text cleaning illustration">
+                    <button>Run Cleaning <i class="fa-solid fa-arrow-right"></i></button>
+                </article>
+                <article class="feature-card" data-route="repair">
+                    <div>
+                        <h3>Data Repair</h3>
+                        <p>Use your local Ollama llama3 model to infer missing merchant categories without deleting broken rows.</p>
+                    </div>
+                    <img src="/static/assets/one-prompt.png" alt="One Prompt Full Pipeline illustration">
+                    <button>Run Repair <i class="fa-solid fa-arrow-right"></i></button>
+                </article>
+                <article class="feature-card" data-route="generation">
+                    <div>
+                        <h3>Data Generation</h3>
+                        <p>Train CTGAN on repaired rows and generate a synthetic dataset with fidelity checks and CSV export.</p>
+                    </div>
+                    <img src="/static/assets/data-stack.png" alt="GPU training data stack">
+                    <button>Generate <i class="fa-solid fa-arrow-right"></i></button>
+                </article>
+            </section>
+
+            <section class="workflow-overview">
+                <div class="section-heading">
+                    <p class="eyebrow">Feature Workflow Chart</p>
+                    <h2>Every feature has a visible path.</h2>
+                </div>
+                <div class="feature-flow-grid">
+                    <article>
+                        <h3><i class="fa-solid fa-broom"></i>Data Cleaning</h3>
+                        <div class="flow-mini">
+                            <span>Raw CSV</span><i></i><span>Normalize</span><i></i><span>Parse</span><i></i><span>Clean CSV</span>
+                        </div>
+                        <p>Best for duplicate rows, messy strings, missing numbers, and invalid date formats.</p>
+                    </article>
+                    <article>
+                        <h3><i class="fa-solid fa-screwdriver-wrench"></i>Data Repair</h3>
+                        <div class="flow-mini">
+                            <span>Dirty CSV</span><i></i><span>Scan</span><i></i><span>Rules + Llama</span><i></i><span>Repaired CSV</span>
+                        </div>
+                        <p>Best for broken products, payment labels, IDs, dates, negative prices, and missing statuses.</p>
+                    </article>
+                    <article>
+                        <h3><i class="fa-solid fa-wand-magic-sparkles"></i>Data Generation</h3>
+                        <div class="flow-mini">
+                            <span>Repaired Data</span><i></i><span>Train CTGAN</span><i></i><span>Calibrate</span><i></i><span>Synthetic CSV</span>
+                        </div>
+                        <p>Best for creating private synthetic rows that preserve the original table shape and numeric distributions.</p>
+                    </article>
+                </div>
+                <div class="author-chip">Author: Kartikeya Krishna Mishra</div>
+            </section>
+
+            <section id="agent-chat" class="chat-section">
+                <div class="section-heading">
+                    <p class="eyebrow">Local Agent</p>
+                    <h2>Tell it what data job you need.</h2>
+                </div>
+                <div class="chat-layout">
+                    <div class="chat-panel" data-chat-drop>
+                        <div class="chat-log" id="chat-log">
+                            <div class="chat-message bot">I can route and run generation, repair, or cleaning. Try: "I need financial synthetic data with fraud rows" or drop a CSV and say "clean this".</div>
+                        </div>
+                        <div class="chat-dropzone">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                            <span>Drop CSV for the agent</span>
+                            <input id="chat-file-input" type="file" accept=".csv" hidden>
+                        </div>
+                        <form class="chat-form" id="chat-form">
+                            <input id="chat-input" type="text" placeholder="Ask for generation, repair, or cleaning" autocomplete="off">
+                            <button class="btn btn-green" type="submit">Send</button>
+                        </form>
+                    </div>
+                    <div class="terminal-card compact-terminal">
+                        <div class="terminal-window" data-terminal="agent">
+                            <div class="terminal-title">
+                                <span><i class="fa-brands fa-windows"></i> Windows PowerShell</span>
+                                <span>agent</span>
+                            </div>
+                            <div class="terminal-lines"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="how-section">
+                <p class="eyebrow">How It Works</p>
+                <h2>From raw data to synthetic CSV in minutes.</h2>
+                <div class="how-grid">
+                    <article><span>01</span><h3>Upload Dataset</h3><p>Drop in a CSV or generate a dirty sample dataset locally.</p></article>
+                    <article><span>02</span><h3>Clean Rows</h3><p>Remove duplicate noise and normalize common tabular mess.</p></article>
+                    <article><span>03</span><h3>Repair With Llama</h3><p>Ollama fills missing categories from row context.</p></article>
+                    <article><span>04</span><h3>Generate CSV</h3><p>CTGAN samples net-new synthetic transaction rows.</p></article>
+                </div>
+            </section>
+        </section>
+
+        <section id="generation" class="page tool-page">
+            <div class="tool-copy">
+                <p class="eyebrow">Data Generation</p>
+                <h1>Synthetic rows trained on your repaired dataset.</h1>
+                <p>Generate mock seed data or upload your own CSV, then run the CTGAN generator. If repair has not run yet, the app repairs first with local Llama 3.</p>
+            </div>
+            <section class="top-workflow-card">
+                <div class="top-workflow-head">
+                    <span>How data is generated</span>
+                    <strong>Clean input -> repair rows -> train CTGAN -> calibrate numbers -> export synthetic CSV</strong>
+                </div>
+                <div class="process-strip">
+                    <div><i class="fa-solid fa-file-csv"></i><strong>Source CSV</strong><small>uploaded or sample</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-screwdriver-wrench"></i><strong>Repair Pass</strong><small>clean training base</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-brain"></i><strong>CTGAN</strong><small>learn patterns</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-chart-line"></i><strong>Calibrate</strong><small>match distributions</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-download"></i><strong>Export</strong><small>synthetic CSV</small></div>
+                </div>
+            </section>
+            <div class="generation-intel-grid">
+                <section class="query-panel feature-intel" data-intel="generation">
+                    <h2>Generation Intelligence</h2>
+                    <div class="query-view">
+                        <span>User query</span>
+                        <strong id="generation-query-view">No generation request entered yet.</strong>
+                    </div>
+                    <div class="query-view">
+                        <span>Model interpretation</span>
+                        <strong id="generation-interpretation-view">The generator will infer schema from the uploaded or sample CSV.</strong>
+                    </div>
+                    <div class="query-view">
+                        <span>CSV understanding</span>
+                        <strong data-intel-field="understood">Upload a CSV or choose a template to populate schema understanding.</strong>
+                    </div>
+                    <div class="query-view">
+                        <span>Expected output</span>
+                        <strong data-intel-field="expected">A synthetic CSV trained on repaired local data.</strong>
+                    </div>
+                </section>
+                <section class="generation-chat-panel">
+                    <h2>Generation Chatbot</h2>
+                    <div class="chat-upload-card" id="generation-chat-upload" role="button" tabindex="0">
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                        <div>
+                            <strong>Upload CSV to analyze</strong>
+                            <span>I will inspect schema, missing values, and ask dataset-specific follow ups.</span>
+                        </div>
+                        <input id="generation-chat-file-input" type="file" accept=".csv" hidden>
+                    </div>
+                    <div class="mini-chat-log" id="generation-chat-log">
+                        <div class="chat-message bot">Upload a CSV or tell me the kind of financial data you want. I will ask follow-ups before generating the output.</div>
+                    </div>
+                    <form class="mini-chat-form" id="generation-chat-form">
+                        <input id="generation-chat-input" type="text" placeholder="Example: generate 100k financial transactions with fraud cases">
+                        <button class="btn btn-green" type="submit">Set Query</button>
+                    </form>
+                </section>
+            </div>
+            <div class="tool-layout">
+                <div class="tool-panel">
+                    <h2>Start a generation job</h2>
+                    <div class="upload-zone" data-upload-zone>
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Drop a CSV here</p>
+                        <button class="btn btn-outline" type="button">Browse Files</button>
+                        <input type="file" accept=".csv" hidden>
+                    </div>
+                    <div class="button-row">
+                        <button class="btn btn-outline" data-action="mock"><i class="fa-solid fa-flask"></i>Mock Dirty Data</button>
+                        <button class="btn btn-outline" data-action="sample-generation"><i class="fa-solid fa-vial-circle-check"></i>Test Sample</button>
+                        <button class="btn btn-black" data-action="generation"><i class="fa-solid fa-wand-magic-sparkles"></i>Run Generation</button>
+                    </div>
+                    <section class="template-panel">
+                        <h3>Generation templates</h3>
+                        <div class="template-grid">
+                            <button type="button" data-generation-template="Generate 50000 financial transaction rows with Credit Card, PayPal, and Cash payments. Include realistic prices, product names, statuses, and no missing values.">Financial transactions</button>
+                            <button type="button" data-generation-template="Generate synthetic ecommerce order data with customer IDs, product names, quantities, prices, payment methods, and order statuses. Keep all IDs synthetic.">Ecommerce orders</button>
+                            <button type="button" data-generation-template="Generate fraud-review transaction data with rare suspicious cases, realistic payment methods, positive prices, and review-ready transaction statuses.">Fraud review set</button>
+                            <button type="button" data-generation-template="Generate clean customer purchase history data with repeat customers, multiple product categories, valid dates, and no duplicates.">Customer history</button>
+                        </div>
+                    </section>
+                    <section class="tool-chat-panel">
+                        <div class="tool-chat-head">
+                            <i class="fa-solid fa-comments"></i>
+                            <strong>Generation Chatbot</strong>
+                        </div>
+                        <div class="chat-log tool-chat-log" id="shared-generation-chat-log">
+                            <div class="chat-message bot">I am synced with the homepage chatbot. Ask me to generate, clean, repair, or route this dataset.</div>
+                        </div>
+                        <form class="chat-form tool-chat-form" id="shared-generation-chat-form">
+                            <input id="shared-generation-chat-input" type="text" placeholder="Ask the synced agent what to run" autocomplete="off">
+                            <button class="btn btn-green" type="submit">Send</button>
+                        </form>
+                    </section>
+                </div>
+                <div class="result-panel">
+                    <img src="/static/assets/row-capacity.png" alt="500K row capacity illustration">
+                    <div id="generation-output" class="output-box">Ready for a local generation run.</div>
+                </div>
+            </div>
+            <div class="operations-grid">
+                <section class="workflow-card">
+                    <h2>Generation Workflow</h2>
+                    <div class="workflow-canvas" data-workflow="generation">
+                        <div class="workflow-node source" data-step="0"><i class="fa-solid fa-database"></i><strong>Repaired CSV</strong><small>input dataset</small></div>
+                        <div class="workflow-line" data-line="0"></div>
+                        <div class="workflow-node" data-step="1"><i class="fa-solid fa-sliders"></i><strong>Schema Map</strong><small>discrete columns</small></div>
+                        <div class="workflow-line" data-line="1"></div>
+                        <div class="workflow-node active-node" data-step="2"><i class="fa-solid fa-brain"></i><strong>CTGAN Train</strong><small>local model</small></div>
+                        <div class="workflow-line" data-line="2"></div>
+                        <div class="workflow-node" data-step="3"><i class="fa-solid fa-file-csv"></i><strong>Synthetic CSV</strong><small>download</small></div>
+                    </div>
+                </section>
+                <section class="compare-card" data-compare="generation">
+                    <h2>Before vs After</h2>
+                    <div class="compare-empty">Run generation to see source vs synthetic rows.</div>
+                </section>
+                <section class="terminal-card">
+                    <div class="terminal-window" data-terminal="generation">
+                        <div class="terminal-title"><span><i class="fa-brands fa-windows"></i> Windows PowerShell</span><span>generation</span></div>
+                        <div class="terminal-lines"></div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section id="repair" class="page tool-page">
+            <div class="tool-copy">
+                <p class="eyebrow">Data Repair</p>
+                <h1>Repair broken categorical rows with local Llama 3.</h1>
+                <p>Your terminal is running <strong>ollama run llama3</strong>. The app calls Ollama at localhost:11434 and uses llama3 to infer missing merchant categories.</p>
+            </div>
+            <section class="top-workflow-card">
+                <div class="top-workflow-head">
+                    <span>How data is repaired</span>
+                    <strong>Load dirty CSV -> detect anomalies -> apply rules -> use local Llama 3 where needed -> export repaired CSV</strong>
+                </div>
+                <div class="process-strip">
+                    <div><i class="fa-solid fa-file-import"></i><strong>Dirty CSV</strong><small>nulls + bad values</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-magnifying-glass-chart"></i><strong>Scan</strong><small>missing, dates, negatives</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-list-check"></i><strong>Rules</strong><small>IDs, prices, labels</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-terminal"></i><strong>Llama 3</strong><small>semantic repair</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-check-double"></i><strong>Repaired</strong><small>validated CSV</small></div>
+                </div>
+            </section>
+            <section class="query-panel feature-intel feature-intel-top" data-intel="repair">
+                <h2>Repair Intelligence</h2>
+                <div class="query-view"><span>Query</span><strong data-intel-field="query">Repair broken values in the active CSV.</strong></div>
+                <div class="query-view"><span>Problem interpreted</span><strong data-intel-field="problem">Choose a sample or upload a CSV to inspect missing values, dates, IDs, products, and numeric anomalies.</strong></div>
+                <div class="query-view"><span>What model understood</span><strong data-intel-field="understood">No CSV inspected yet.</strong></div>
+                <div class="query-view"><span>What to expect</span><strong data-intel-field="expected">A repaired CSV with fewer blanks, normalized labels, and corrected amount-like values.</strong></div>
+            </section>
+            <div class="tool-layout">
+                <div class="tool-panel">
+                    <h2>Repair dataset</h2>
+                    <p class="panel-note">This keeps every row, fixes negative amounts statistically, and uses Llama 3 only for contextual category repair.</p>
+                    <div class="button-row">
+                        <button class="btn btn-outline" data-action="mock"><i class="fa-solid fa-flask"></i>Mock Dirty Data</button>
+                        <button class="btn btn-outline" data-action="sample-repair"><i class="fa-solid fa-vial-circle-check"></i>Test Sample</button>
+                        <button class="btn btn-green" data-action="repair"><i class="fa-solid fa-screwdriver-wrench"></i>Run Repair</button>
+                    </div>
+                    <section class="sample-picker">
+                        <h3>Repair sample CSVs</h3>
+                        <div class="sample-card-grid">
+                            <button type="button" data-repair-sample="missing-payments">
+                                <strong>Missing payments</strong>
+                                <span>Missing statuses, bad payment labels, partial products, invalid dates.</span>
+                                <em>Expect normalized labels, filled status, repaired dates and positive values.</em>
+                            </button>
+                            <button type="button" data-repair-sample="negative-prices">
+                                <strong>Negative prices</strong>
+                                <span>Negative prices, negative quantities, zero quantity, mixed status labels.</span>
+                                <em>Expect positive prices/quantities, quantity minimum of one, clean labels.</em>
+                            </button>
+                            <button type="button" data-repair-sample="dates-ids">
+                                <strong>Broken dates and IDs</strong>
+                                <span>Missing IDs, impossible dates, partial product names, negative price.</span>
+                                <em>Expect generated IDs, valid dates, product repair, and no negatives.</em>
+                            </button>
+                            <button type="button" data-repair-sample="duplicates-mixed">
+                                <strong>Duplicates mixed</strong>
+                                <span>Duplicate rows plus dates, IDs, product names, and numeric errors.</span>
+                                <em>Expect dedupe, repaired IDs/dates/products, and cleaned numeric fields.</em>
+                            </button>
+                        </div>
+                    </section>
+                    <section class="tool-chat-panel">
+                        <div class="tool-chat-head">
+                            <i class="fa-solid fa-comments"></i>
+                            <strong>Repair Chatbot</strong>
+                        </div>
+                        <div class="chat-log tool-chat-log" id="repair-chat-log">
+                            <div class="chat-message bot">I am synced with the homepage chatbot. Ask me to repair missing values, fix broken rows, or explain the current repair output.</div>
+                        </div>
+                        <form class="chat-form tool-chat-form" id="repair-chat-form">
+                            <input id="repair-chat-input" type="text" placeholder="Ask about repairing this dataset" autocomplete="off">
+                            <button class="btn btn-green" type="submit">Send</button>
+                        </form>
+                    </section>
+                </div>
+                <div class="result-panel">
+                    <img src="/static/assets/one-prompt.png" alt="One Prompt Full Pipeline illustration">
+                    <div id="repair-output" class="output-box">Ready to repair rows with Ollama.</div>
+                </div>
+            </div>
+            <div class="operations-grid">
+                <section class="workflow-card">
+                    <h2>Repair Workflow</h2>
+                    <div class="workflow-canvas" data-workflow="repair">
+                        <div class="workflow-node source" data-step="0"><i class="fa-solid fa-file-csv"></i><strong>Dirty CSV</strong><small>raw rows</small></div>
+                        <div class="workflow-line" data-line="0"></div>
+                        <div class="workflow-node" data-step="1"><i class="fa-solid fa-magnifying-glass-chart"></i><strong>Anomaly Scan</strong><small>nulls + negatives</small></div>
+                        <div class="workflow-line" data-line="1"></div>
+                        <div class="workflow-node active-node" data-step="2"><i class="fa-solid fa-terminal"></i><strong>Ollama llama3</strong><small>category inference</small></div>
+                        <div class="workflow-line" data-line="2"></div>
+                        <div class="workflow-node" data-step="3"><i class="fa-solid fa-check-double"></i><strong>Repaired CSV</strong><small>zero nulls</small></div>
+                    </div>
+                </section>
+                <section class="compare-card" data-compare="repair">
+                    <h2>Before vs After</h2>
+                    <div class="compare-empty">Run repair to see damaged vs repaired rows.</div>
+                </section>
+                <section class="terminal-card">
+                    <div class="terminal-window" data-terminal="repair">
+                        <div class="terminal-title"><span><i class="fa-brands fa-windows"></i> Windows PowerShell</span><span>repair</span></div>
+                        <div class="terminal-lines"></div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section id="cleaning" class="page tool-page">
+            <div class="tool-copy">
+                <p class="eyebrow">Data Cleaning</p>
+                <h1>Clean duplicates, strings, dates, and missing numbers.</h1>
+                <p>This preprocessing pass prepares raw CSVs before deeper LLM repair and synthetic generation.</p>
+            </div>
+            <section class="top-workflow-card">
+                <div class="top-workflow-head">
+                    <span>How data is cleaned</span>
+                    <strong>Read CSV -> trim text -> parse numeric/date columns -> fill blanks -> remove duplicates</strong>
+                </div>
+                <div class="process-strip">
+                    <div><i class="fa-solid fa-file-csv"></i><strong>Raw CSV</strong><small>mixed schema</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-align-left"></i><strong>Normalize</strong><small>trim strings</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-calendar-check"></i><strong>Parse</strong><small>dates + currency</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-fill-drip"></i><strong>Fill</strong><small>missing values</small></div>
+                    <span></span>
+                    <div><i class="fa-solid fa-filter-circle-xmark"></i><strong>Dedupe</strong><small>clean CSV</small></div>
+                </div>
+            </section>
+            <section class="query-panel feature-intel feature-intel-top" data-intel="cleaning">
+                <h2>Cleaning Intelligence</h2>
+                <div class="query-view"><span>Query</span><strong data-intel-field="query">Clean the active CSV before repair or generation.</strong></div>
+                <div class="query-view"><span>Problem interpreted</span><strong data-intel-field="problem">Upload a CSV or use mock data to inspect duplicates, whitespace, dates, and blanks.</strong></div>
+                <div class="query-view"><span>What model understood</span><strong data-intel-field="understood">No CSV inspected yet.</strong></div>
+                <div class="query-view"><span>What to expect</span><strong data-intel-field="expected">A cleaner CSV with trimmed strings, parsed values, and duplicate rows removed.</strong></div>
+            </section>
+            <div class="tool-layout">
+                <div class="tool-panel">
+                    <h2>Clean dataset</h2>
+                    <div class="upload-zone" data-upload-zone>
+                        <i class="fa-solid fa-file-csv"></i>
+                        <p>Drop a CSV here</p>
+                        <button class="btn btn-outline" type="button">Browse Files</button>
+                        <input type="file" accept=".csv" hidden>
+                    </div>
+                    <div class="button-row">
+                        <button class="btn btn-outline" data-action="mock"><i class="fa-solid fa-flask"></i>Mock Dirty Data</button>
+                        <button class="btn btn-outline" data-action="sample-cleaning"><i class="fa-solid fa-vial-circle-check"></i>Test Sample</button>
+                        <button class="btn btn-black" data-action="cleaning"><i class="fa-solid fa-broom"></i>Run Cleaning</button>
+                    </div>
+                    <section class="tool-chat-panel">
+                        <div class="tool-chat-head">
+                            <i class="fa-solid fa-comments"></i>
+                            <strong>Cleaning Chatbot</strong>
+                        </div>
+                        <div class="chat-log tool-chat-log" id="cleaning-chat-log">
+                            <div class="chat-message bot">I am synced with the homepage chatbot. Ask me to clean duplicates, trim strings, fix dates, or route this dataset.</div>
+                        </div>
+                        <form class="chat-form tool-chat-form" id="cleaning-chat-form">
+                            <input id="cleaning-chat-input" type="text" placeholder="Ask about cleaning this dataset" autocomplete="off">
+                            <button class="btn btn-green" type="submit">Send</button>
+                        </form>
+                    </section>
+                </div>
+                <div class="result-panel">
+                    <img src="/static/assets/crux-cleaning.png" alt="Crux text cleaning illustration">
+                    <div id="cleaning-output" class="output-box">Ready to clean a dataset.</div>
+                </div>
+            </div>
+            <div class="operations-grid">
+                <section class="workflow-card">
+                    <h2>Cleaning Workflow</h2>
+                    <div class="workflow-canvas" data-workflow="cleaning">
+                        <div class="workflow-node source" data-step="0"><i class="fa-solid fa-file-import"></i><strong>Raw CSV</strong><small>uploaded rows</small></div>
+                        <div class="workflow-line" data-line="0"></div>
+                        <div class="workflow-node" data-step="1"><i class="fa-solid fa-filter"></i><strong>Deduplicate</strong><small>row identity</small></div>
+                        <div class="workflow-line" data-line="1"></div>
+                        <div class="workflow-node active-node" data-step="2"><i class="fa-solid fa-broom"></i><strong>Normalize</strong><small>strings + dates</small></div>
+                        <div class="workflow-line" data-line="2"></div>
+                        <div class="workflow-node" data-step="3"><i class="fa-solid fa-table"></i><strong>Cleaned CSV</strong><small>download</small></div>
+                    </div>
+                </section>
+                <section class="compare-card" data-compare="cleaning">
+                    <h2>Before vs After</h2>
+                    <div class="compare-empty">Run cleaning to see raw vs cleaned rows.</div>
+                </section>
+                <section class="terminal-card">
+                    <div class="terminal-window" data-terminal="cleaning">
+                        <div class="terminal-title"><span><i class="fa-brands fa-windows"></i> Windows PowerShell</span><span>cleaning</span></div>
+                        <div class="terminal-lines"></div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/script.js?v=13"></script>
+</body>
+</html>

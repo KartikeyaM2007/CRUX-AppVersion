@@ -1,0 +1,3 @@
+transaction_id,date,user_id,merchant_name,merchant_category,is_fraud,amount
+1,2026-05-19,101,TestMerchant,Retail,0,50.00
+2,2026-05-19,102,TestMerchant2,Food,0,25.50

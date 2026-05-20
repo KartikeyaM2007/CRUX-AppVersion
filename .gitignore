@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Desktop/build artifacts
+build/
+dist/
+release/
+*.spec.bak
+
+# Runtime data
+verification/
+bundled_web/data/*.csv
+bundled_web/data/verification/
+
+# Local logs and configs
+*.log
+*.pid
+.env
+desktop_config.json
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

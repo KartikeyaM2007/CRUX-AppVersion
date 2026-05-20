@@ -1,0 +1,6 @@
+Transaction_ID,Transaction_Date,Customer_ID,Product_Name,Quantity,Price,Payment_Method,Transaction_Status
+,2023-13-01,C501,Tab,1,$199.99,pay pal,complete
+T3002,2025-02-30,,Coffee M,2,$40.00,Cash,Pending
+T3003,not-a-date,C503,Lap,1,$780.00,creditcard,completed
+T3004,,C504,Headphone,3,$90.00,PayPal ,Failed
+,2024-07-09,,Smartph,1,-620.00,credit card,

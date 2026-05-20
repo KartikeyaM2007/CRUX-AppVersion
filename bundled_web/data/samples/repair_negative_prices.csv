@@ -1,0 +1,6 @@
+Transaction_ID,Transaction_Date,Customer_ID,Product_Name,Quantity,Price,Payment_Method,Transaction_Status
+T2001,2024-05-01,C410,Laptop,1,-999.99,creditcard,Completed
+T2002,2024-05-02,C411,Tablet,-2,-240.00,pay pal,Pending
+T2003,2024-05-03,C412,Coffee Machine,0,$120.50,Cash,Failed
+T2004,2024-05-04,C413,Headphones,4,-80.00,PayPal,completed
+T2005,2024-05-05,C414,Smartphone,-1,$599.10,credit card,

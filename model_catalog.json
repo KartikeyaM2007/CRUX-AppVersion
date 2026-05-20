@@ -1,0 +1,42 @@
+[
+  {
+    "id": "llama3",
+    "name": "Llama 3",
+    "provider": "Ollama",
+    "recommended": true,
+    "purpose": "General local repair assistant for missing labels, product interpretation, and row explanations.",
+    "download_command": "ollama pull llama3"
+  },
+  {
+    "id": "qwen2.5:0.5b",
+    "name": "Qwen 2.5 0.5B",
+    "provider": "Ollama",
+    "recommended": false,
+    "purpose": "Small, fast fallback model for low-memory laptops.",
+    "download_command": "ollama pull qwen2.5:0.5b"
+  },
+  {
+    "id": "phi3:mini",
+    "name": "Phi-3 Mini",
+    "provider": "Ollama",
+    "recommended": false,
+    "purpose": "Compact local reasoning model for repair explanations.",
+    "download_command": "ollama pull phi3:mini"
+  },
+  {
+    "id": "mistral",
+    "name": "Mistral",
+    "provider": "Ollama",
+    "recommended": false,
+    "purpose": "Stronger local text model when the machine has more memory.",
+    "download_command": "ollama pull mistral"
+  },
+  {
+    "id": "ctgan",
+    "name": "CTGAN Tabular Engine",
+    "provider": "Python package",
+    "recommended": true,
+    "purpose": "Synthetic tabular data generator used by Crux generation workflows.",
+    "download_command": "python -m pip install -r bundled_web/requirements.txt"
+  }
+]

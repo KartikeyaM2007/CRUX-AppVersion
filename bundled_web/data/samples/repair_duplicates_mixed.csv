@@ -1,0 +1,6 @@
+Transaction_ID,Transaction_Date,Customer_ID,Product_Name,Quantity,Price,Payment_Method,Transaction_Status
+T4001,2024-06-01,C601,Coffee ,1,$6.25,pay pal,completed
+T4001,2024-06-01,C601,Coffee ,1,$6.25,pay pal,completed
+T4002,2024-06-02,C602,Tabl,2,$220.00,creditcard,Pending
+T4003,2024-06-03,C603,Lapt,-1,-910.10,Cash,Failed
+T4004,2024-99-99,,Headpho,3,$75.00,PayPal ,
